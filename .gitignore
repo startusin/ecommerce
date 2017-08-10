@@ -3,3 +3,4 @@
 /vendor/
 /cli/*
 !/cli/.gitkeep
+.idea/*
