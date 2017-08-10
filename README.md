@@ -7,3 +7,6 @@
 6) Import all data using xml file (in our case master/filmsstore.wordpress.2017-08-10.xml) and wp importer (already installed).
 7) Go to Settings -> Permalinks, select Post name then click on Save Changes button.
 8) **Hooray! You are finished installation.**
+
+# SASS
+To compile SASS files use Grunt (will be installed automatically after composer update). Use ```grunt``` command to run compile watcher.
