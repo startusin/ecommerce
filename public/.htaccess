@@ -1,0 +1,246 @@
+RewriteCond %{HTTP_HOST} ^n-ix\.se$ [NC]
+RewriteRule ^(.*)$ http://n-ix.com/$1 [R=301,L]
+RewriteCond %{HTTP_HOST} ^www\.n-ix\.se$ [NC]
+RewriteRule ^(.*)$ http://n-ix.com/$1 [R=301,L]
+RewriteCond %{HTTP_HOST} ^www\.n-ix\.com$ [NC]
+RewriteRule ^(.*)$ http://n-ix.com/$1 [R=301,L]
+RewriteCond %{HTTP_HOST} ^n-ix\.com\.ua$ [NC]
+RewriteRule ^(.*)$ http://n-ix.com/$1 [R=301,L]
+RewriteCond %{HTTP_HOST} ^www\.n-ix\.com\.ua$ [NC]
+RewriteRule ^(.*)$ http://n-ix.com/$1 [R=301,L]
+
+# BEGIN WP Rocket v2.8.23
+# Use UTF-8 encoding for anything served text/plain or text/html
+AddDefaultCharset UTF-8
+# Force UTF-8 for a number of file formats
+<IfModule mod_mime.c>
+AddCharset UTF-8 .atom .css .js .json .rss .vtt .xml
+</IfModule>
+
+# FileETag None is not enough for every server.
+<IfModule mod_headers.c>
+Header unset ETag
+</IfModule>
+
+# Since we’re sending far-future expires, we don’t need ETags for static content.
+# developer.yahoo.com/performance/rules.html#etags
+FileETag None
+
+<IfModule mod_alias.c>
+<FilesMatch "\.(html|htm|rtf|rtx|txt|xsd|xsl|xml)$">
+<IfModule mod_headers.c>
+Header set X-Powered-By "WP Rocket/2.8.23"
+Header unset Pragma
+Header append Cache-Control "public"
+Header unset Last-Modified
+</IfModule>
+</FilesMatch>
+
+<FilesMatch "\.(css|htc|js|asf|asx|wax|wmv|wmx|avi|bmp|class|divx|doc|docx|eot|exe|gif|gz|gzip|ico|jpg|jpeg|jpe|json|mdb|mid|midi|mov|qt|mp3|m4a|mp4|m4v|mpeg|mpg|mpe|mpp|otf|odb|odc|odf|odg|odp|ods|odt|ogg|pdf|png|pot|pps|ppt|pptx|ra|ram|svg|svgz|swf|tar|tif|tiff|ttf|ttc|wav|wma|wri|xla|xls|xlsx|xlt|xlw|zip)$">
+<IfModule mod_headers.c>
+Header unset Pragma
+Header append Cache-Control "public"
+</IfModule>
+</FilesMatch>
+</IfModule>
+
+# Expires headers (for better cache control)
+<IfModule mod_expires.c>
+ExpiresActive on
+
+# Perhaps better to whitelist expires rules? Perhaps.
+ExpiresDefault                          "access plus 1 month"
+
+# cache.appcache needs re-requests in FF 3.6 (thanks Remy ~Introducing HTML5)
+ExpiresByType text/cache-manifest       "access plus 0 seconds"
+
+# Your document html
+ExpiresByType text/html                 "access plus 0 seconds"
+
+# Data
+ExpiresByType text/xml                  "access plus 0 seconds"
+ExpiresByType application/xml           "access plus 0 seconds"
+ExpiresByType application/json          "access plus 0 seconds"
+
+# Feed
+ExpiresByType application/rss+xml       "access plus 1 hour"
+ExpiresByType application/atom+xml      "access plus 1 hour"
+
+# Favicon (cannot be renamed)
+ExpiresByType image/x-icon              "access plus 1 week"
+
+# Media: images, video, audio
+ExpiresByType image/gif                 "access plus 1 month"
+ExpiresByType image/png                 "access plus 1 month"
+ExpiresByType image/jpeg                "access plus 1 month"
+ExpiresByType video/ogg                 "access plus 1 month"
+ExpiresByType audio/ogg                 "access plus 1 month"
+ExpiresByType video/mp4                 "access plus 1 month"
+ExpiresByType video/webm                "access plus 1 month"
+
+# HTC files  (css3pie)
+ExpiresByType text/x-component          "access plus 1 month"
+
+# Webfonts
+ExpiresByType application/x-font-ttf    "access plus 1 month"
+ExpiresByType font/opentype             "access plus 1 month"
+ExpiresByType application/x-font-woff   "access plus 1 month"
+ExpiresByType application/x-font-woff2  "access plus 1 month"
+ExpiresByType image/svg+xml             "access plus 1 month"
+ExpiresByType application/vnd.ms-fontobject "access plus 1 month"
+
+# CSS and JavaScript
+ExpiresByType text/css                  "access plus 1 year"
+ExpiresByType application/javascript    "access plus 1 year"
+
+</IfModule>
+
+# Gzip compression
+<IfModule mod_deflate.c>
+# Active compression
+SetOutputFilter DEFLATE
+# Force deflate for mangled headers
+<IfModule mod_setenvif.c>
+<IfModule mod_headers.c>
+SetEnvIfNoCase ^(Accept-EncodXng|X-cept-Encoding|X{15}|~{15}|-{15})$ ^((gzip|deflate)\s*,?\s*)+|[X~-]{4,13}$ HAVE_Accept-Encoding
+RequestHeader append Accept-Encoding "gzip,deflate" env=HAVE_Accept-Encoding
+# Don’t compress images and other uncompressible content
+SetEnvIfNoCase Request_URI \
+\.(?:gif|jpe?g|png|rar|zip|exe|flv|mov|wma|mp3|avi|swf|mp?g|mp4|webm|webp)$ no-gzip dont-vary
+</IfModule>
+</IfModule>
+
+# Compress all output labeled with one of the following MIME-types
+<IfModule mod_filter.c>
+AddOutputFilterByType DEFLATE application/atom+xml \
+		                          application/javascript \
+		                          application/json \
+		                          application/rss+xml \
+		                          application/vnd.ms-fontobject \
+		                          application/x-font-ttf \
+		                          application/xhtml+xml \
+		                          application/xml \
+		                          font/opentype \
+		                          image/svg+xml \
+		                          image/x-icon \
+		                          text/css \
+		                          text/html \
+		                          text/plain \
+		                          text/x-component \
+		                          text/xml
+</IfModule>
+<IfModule mod_headers.c>
+Header append Vary: Accept-Encoding
+</IfModule>
+</IfModule>
+
+<IfModule mod_mime.c>
+AddType text/html .html_gzip
+AddEncoding gzip .html_gzip
+</IfModule>
+<IfModule mod_setenvif.c>
+SetEnvIfNoCase Request_URI \.html_gzip$ no-gzip
+</IfModule>
+
+<IfModule mod_rewrite.c>
+RewriteEngine On
+RewriteBase /
+RewriteCond %{HTTPS} on [OR]
+RewriteCond %{SERVER_PORT} ^443$ [OR]
+RewriteCond %{HTTP:X-Forwarded-Proto} https
+RewriteRule .* - [E=WPR_SSL:-https]
+RewriteCond %{HTTP:Accept-Encoding} gzip
+RewriteRule .* - [E=WPR_ENC:_gzip]
+RewriteCond %{REQUEST_METHOD} GET
+RewriteCond %{QUERY_STRING} =""
+RewriteCond %{HTTP:Cookie} !(wordpress_logged_in_|wp-postpass_|wptouch_switch_toggle|comment_author_|comment_author_email_) [NC]
+RewriteCond %{HTTP_USER_AGENT} !^(facebookexternalhit|FB_IAB|FB4A|FBAV).* [NC]
+RewriteCond "%{DOCUMENT_ROOT}/wp-content/cache/wp-rocket/%{HTTP_HOST}%{REQUEST_URI}/index%{ENV:WPR_SSL}.html%{ENV:WPR_ENC}" -f
+RewriteRule .* "/wp-content/cache/wp-rocket/%{HTTP_HOST}%{REQUEST_URI}/index%{ENV:WPR_SSL}.html%{ENV:WPR_ENC}" [L]
+
+</IfModule>
+# END WP Rocket
+
+# BEGIN WordPress
+<IfModule mod_rewrite.c>
+RewriteEngine On
+RewriteBase /
+RewriteRule ^index\.php$ - [L]
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule . /index.php [L]
+</IfModule>
+
+# END WordPress
+RedirectMatch 301 ^/company/?$ http://n-ix.com/company-overview/
+Redirect 301 /2015/01/14-top-ukrainian-game-developers-2014/ http://n-ix.com/14-top-ukrainian-game-developers-in-2014/
+Redirect 301 /qa-outsourcing/ http://n-ix.com/software-testing/
+Redirect 301 /blog/software-development-ukraine/ http://n-ix.com/category/software-product-development/
+Redirect 301 /2016/01/what-is-virtual-reality/ http://n-ix.com/what-is-virtual-reality/
+Redirect 301 /2015/03/10-fintech-companies-outsourcing-ukrainian-developers/ http://n-ix.com/10-fintech-companies-outsourcing-to-ukrainian-developers/
+Redirect 301 /2014/05/nearshoring-3-reasons-go-ukraine-2014/ http://n-ix.com/nearshoring-3-reasons-to-go-for-ukraine-in-2014/
+Redirect 301 /microsoft-business-intelligence/&redirect=true http://n-ix.com/microsoft-business-intelligence/
+Redirect 301 /business-intelligence/ http://n-ix.com/microsoft-business-intelligence/
+Redirect 301 /business-intelligence-development/ http://n-ix.com/microsoft-business-intelligence/
+Redirect 301 /game-%20development/king-of-%20the-mountain/ http://n-ix.com/game-casesy/king-of-the-mountain/
+Redirect 301 /case-study/moba/ http://n-ix.com/game-cases/moba/
+Redirect 301 /case-study/epic-monsters/ http://n-ix.com/game-cases/epic-monsters/
+Redirect 301 /case-study/epic-heroes/ http://n-ix.com/game-cases/epic-heroes/
+Redirect 301 /case-study/ghost-buzz/ http://n-ix.com/game-cases/ghost-buzz/
+Redirect 301 /case-study/babas-birth/ http://n-ix.com/game-cases/babas-birth/
+Redirect 301 /case-study/elements-epic-battles/ http://n-ix.com/game-cases/elements-epic-battles/
+Redirect 301 /case-study/king-of-the-mountain/ http://n-ix.com/game-cases/king-of-the-mountain/
+Redirect 301 /case-study/two-one-drop-prototype/ http://n-ix.com/game-cases/two-one-drop-prototype/
+Redirect 301 /case-study/golf-clash/ http://n-ix.com/game-cases/golf-clash/
+#18.11.2016
+Redirect 301 /10-fintech-companies-outsourcing-to-ukrainian-developers/www.yapital.com http://n-ix.com/10-fintech-companies-outsourcing-to-ukrainian-developers/
+Redirect 301 /2014/05/nearshore-development-peace-mind/ http://n-ix.com/5-ways-nearshore-development-gives-you-peace-of-mind/
+Redirect 301 /2014/05/offshore-development-center-lviv-ukraine/ http://n-ix.com/offshore-development-center-in-lviv-ukraine-4-highlights/
+Redirect 301 /2014/05/offshore-development-center-ukraine/ http://n-ix.com/offshore-development-center-in-ukraine-5-highlights/
+Redirect 301 /2014/05/ukrainian-dedicated-developers-solution/ http://n-ix.com/ukrainian-dedicated-developers-solution-to-developer-shortage/
+Redirect 301 /2014/06/dedicated-team-startups-others-make-it-work/ http://n-ix.com/dedicated-team-for-startups-how-do-others-make-it-work/
+Redirect 301 /2014/06/epic-heroes-latest-ukraines-mobile-game-development-2/ http://n-ix.com/epic-heroes-latest-in-ukraines-mobile-game-development/
+Redirect 301 /2014/07/software-development-lviv-10n10-facts/ http://n-ix.com/software-development-in-lviv-10-and-10-facts-you-need-to-know/
+Redirect 301 /2014/07/well-funded-tech-companies-outsource-development-ukraine/ http://n-ix.com/9-well-funded-tech-companies-that-outsource-development-to-ukraine/
+Redirect 301 /2014/08/effective-qa-outsourcing/ http://n-ix.com/effective-qa-outsourcing-what-is-it/
+Redirect 301 /2014/09/n-ix-founder-andrew-pavliv-industry-raising-conscious-middle-class-good-earnings-important-country/ http://n-ix.com/n-ix-founder-andrew-pavliv-the-it-industry-is-raising-a-conscious-middle-class-with-good-earnings-this-too-is-important-for-the-country/
+Redirect 301 /2014/09/streamserve-consultants-n-ix-hidden-gem-consulting-firms/ http://n-ix.com/streamserve-consultants-at-n-ix-hidden-gem-for-it-consulting-firms/
+Redirect 301 /2014/09/streamserve-consultants-n-ix-hidden-gem-consulting-firms/ http://n-ix.com/streamserve-consultants-at-n-ix-hidden-gem-for-it-consulting-firms/
+Redirect 301 /2014/09/ukraine-tech-gem-conference-san-francisco/ http://n-ix.com/ukraine-tech-gem-conference-in-san-francisco/
+Redirect 301 /2014/10/garage48-hackathon-first-time-lviv-ukraine-n-ix/ http://n-ix.com/ukrainian-tech-companies-promote-innovations/
+Redirect 301 /2014/10/introducing-12-ukrainian-early-stage-startups-web-summit/ http://n-ix.com/introducing-12-ukrainian-early-stage-startups-at-web-summit/
+Redirect 301 /2014/11/ukrainian-tech-companies-can-become-billion-dollar-businesses/ http://n-ix.com/6-ukrainian-tech-companies-can-become-billion-businesses-in-the-next-five-years/
+Redirect 301 /2015/01/14-top-ukrainian-game-developers-2014 http://n-ix.com/14-top-ukrainian-game-developers-in-2014/
+Redirect 301 /2015/01/considering-dedicated-development-team-ukraine/ http://n-ix.com/blog/
+Redirect 301 /2015/01/dedicated-development-team-it-outsourcing-model/ http://n-ix.com/it-outsourcing-model-for-hiring-a-development-team/
+Redirect 301 /2015/01/map-gathers-ukrainian-software-companies-startups/ http://n-ix.com/a-map-gathers-ukrainian-software-companies-and-startups/
+Redirect 301 /2015/02/lviv-development-companies-empowering-tech-cluster/ http://n-ix.com/lviv-development-companies-empowering-local-tech-cluster/
+Redirect 301 /2015/03/10-fintech-companies-outsoursing-ukrainian-developers http://n-ix.com/10-fintech-companies-outsourcing-to-ukrainian-developers/
+Redirect 301 /2015/03/game-dev-in-ukraine-introducing-elements-epic-heroes/ http://n-ix.com/game-dev-in-ukraine-introducing-elements-epic-heroes/
+Redirect 301 /2015/03/investment-figures-ukrainian-tech-startups/ http://n-ix.com/fresh-investment-figures-on-ukrainian-tech-startups/
+Redirect 301 /2015/03/lviv-it-development-companies-lure-talent-with-real-estate/ http://n-ix.com/lviv-it-development-companies-lure-talent-with-real-estate/
+Redirect 301 /2015/03/ukrainian-developers-shouldnt-emigrate-to-build-startups/ http://n-ix.com/ukrainian-developers-shouldnt-emigrate-to-build-startups/
+Redirect 301 /2015/04/ukrainian-tech-companies-promote-innovations/ http://n-ix.com/ukrainian-tech-companies-promote-innovations/
+Redirect 301 /2015/05/tips-on-mobile-development-ios-extensions/ http://n-ix.com/tips-on-mobile-development-ios-extensions/
+Redirect 301 /2015/05/ukrainian-java-developers-meet-in-lviv/ http://n-ix.com/ukrainian-java-developers-meet-in-lviv/
+Redirect 301 /2015/06/lifehack-for-android-developers-weigthedgridlayout/ http://n-ix.com/lifehack-for-android-developers-weigthedgridlayout/
+Redirect 301 /2015/06/the-internet-of-things-diy-home-automation-system/ http://n-ix.com/the-internet-of-things-diy-home-automation-system/
+Redirect 301 /2015/06/wearables-determining-the-future-of-android-development/ http://n-ix.com/wearables-determining-the-future-of-android-development/
+Redirect 301 /2015/07/lviv-it-arena http://n-ix.com/lviv-it-arena-meeting-point-for-ukrainian-developers-2/
+Redirect 301 /2015/07/n-ix-recognized-as-top-software-testing-firm-on-clutch-co/ http://n-ix.com/clutch-co-recognizes-n-ix-among-top-software-testing-firms/
+Redirect 301 /2015/10/lviv-welcomes-google-developers http://n-ix.com/lviv-hosts-the-largest-google-developers-event-in-ukraine/
+Redirect 301 /2015/10/lviv-welcomes-google-developers/ http://n-ix.com/lviv-hosts-the-largest-google-developers-event-in-ukraine/
+Redirect 301 /2015/10/ukrainian-developers-meet-at-lviv-it-arena/ http://n-ix.com/lviv-it-arena-meeting-point-for-ukrainian-developers-2/
+Redirect 301 /2015/11/garage48-lviv-48-hours-to-bring-startup-ideas-into-life/ http://n-ix.com/garage48-lviv-48-hours-to-bring-startup-ideas-to-life/
+Redirect 301 /2015/11/ukrainian_developers_salaries_2015/ http://n-ix.com/blog/
+Redirect 301 /agile-methodology- http://n-ix.com/
+Redirect 301 /agile-methodology-(scrum)/ http://n-ix.com/
+Redirect 301 /agile-methodology/ http://n-ix.com/
+Redirect 301 /apple-app-site-association http://n-ix.com/
+Redirect 301 /category/blog/page/5/ http://n-ix.com/blog/
+Redirect 301 /career/ http://n-ix.com/careers/
+
+<FilesMatch "\.(xls|doc|pdf|docx|ppt|pptx|xlsx)$">
+   ForceType application/octet-stream
+   Header set Content-Disposition attachment
+</FilesMatch>
